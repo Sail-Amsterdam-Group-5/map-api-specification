@@ -31,7 +31,7 @@ jobs:
       # Step 4: Switch to the target namespace/project
       - name: Switch namespace
         run: |
-          oc project oscar-prod
+          oc project oscar-dev
 
       # Step 5: Build and Push Docker Image
       - name: Build and push Docker image

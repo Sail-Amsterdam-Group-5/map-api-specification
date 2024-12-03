@@ -1,29 +1,22 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
   name: sail-map-api
-  namespace: oscar-prod
+  namespace: oscar-dev
+  labels:
+    app: sail-map-api
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: sail-map-api
-  template:
-    metadata:
-      labels:
-        app: sail-map-api
-    spec:
-      containers:
-        - name: sail-map-api
-          image: earlybird/sail-map-api:latest
-          ports:
-            - containerPort: 3000
+  containers:
+    - name: sail-map-api
+      image: docker.io/earlybirdreal/sail-map-api:latest
+      ports:
+        - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: sail-map-api-service
-  namespace: oscar-prod
+  namespace: oscar-dev
 spec:
   selector:
     app: sail-map-api
@@ -36,7 +29,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: sail-map-api-route
-  namespace: oscar-prod
+  namespace: oscar-dev
 spec:
   to:
     kind: Service
