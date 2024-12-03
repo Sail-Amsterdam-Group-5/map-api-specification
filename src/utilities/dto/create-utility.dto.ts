@@ -1,12 +1,13 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {Location} from "../../locations/entities/location.entity";
+import {CosmosDateTime} from "@nestjs/azure-database";
 
 export class CreateUtilityDto {
     @ApiProperty({
         example: 'Toilet Velperplein',
         description: 'The name of the utility'
     })
-    title: string;
+    name: string;
     @ApiProperty({
         example: 'This is the toilet at Velperplein which is open from 08:00 till 22:00.',
         description: 'The description of the utility'
@@ -17,4 +18,16 @@ export class CreateUtilityDto {
         description: 'The id of the location'
     })
     locationId: number;
+
+    @ApiProperty({
+        example: "toilet",
+        description: 'The type of utility'
+    })
+    type: string;
+
+    @ApiProperty({
+        description: "The dates the utility is available",
+        example: "2021-09-15T14:00:00Z"
+    })
+    dates: string[];
 }

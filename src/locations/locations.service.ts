@@ -11,6 +11,7 @@ export class LocationsService {
     location.id = this.getRandomInt(99);
     location.location = createLocationDto.location;
     location.imageURL = createLocationDto.imageURL;
+    location.createdAt = new Date();
     return location;
   }
 
@@ -27,6 +28,7 @@ export class LocationsService {
     location.id = this.getRandomInt(99);
     location.location = updateLocationDto.location;
     location.imageURL = updateLocationDto.imageURL;
+    location.createdAt = new Date();
     return location;
   }
 
@@ -44,8 +46,10 @@ export class LocationsService {
     } else {
       location.id = id;
     }
-    location.location = '-43.29957, 78.61899';
+    location.location.longtitude = '-43.29957';
+    location.location.latitude = '78.61899'
     location.imageURL = 'https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263';
+    location.createdAt = new Date();
     return location;
   }
 }
