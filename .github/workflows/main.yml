@@ -37,7 +37,7 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t earlybirdreal/sail-map-api:latest .
-          echo "${{ secrets.DOCKER_TOKEN }}" | docker login earlybirdreal --username ${{ secrets.DOCKER_ID }} --password-stdin
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login --username ${{ secrets.DOCKER_ID }} --password-stdin
           docker push earlybirdreal/sail-map-api:latest
 
       # Step 6: Deploy to OpenShift
