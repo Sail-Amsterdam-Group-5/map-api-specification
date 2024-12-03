@@ -3,7 +3,7 @@ LABEL authors="earlybird"
 
 WORKDIR /app
 
-RUN mkdir /app/dist && chmod -R 777 /app/dist
+RUN chmod -R 777 /app
 
 COPY ../package.json package-lock.json ./
 
