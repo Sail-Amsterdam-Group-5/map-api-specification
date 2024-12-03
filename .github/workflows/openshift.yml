@@ -196,7 +196,7 @@ jobs:
       uses: redhat-actions/oc-new-app@v1
       with:
         app_name: ${{ env.APP_NAME }}
-        image: ${{ earlybirdreal/sail-map-api }}
+        image: "earlybirdreal/sail-map-api"
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
         port: ${{ env.APP_PORT }}
 
