@@ -8,16 +8,18 @@ metadata:
 spec:
   containers:
     - name: sail-map-api
-      image: docker.io/earlybirdreal/sail-map-api:latest
+      image: earlybirdreal/sail-map-api:latest
       ports:
         - containerPort: 3000
       resources:
         limits:
-          cpu: "1"
-          memory: "200Mi"
-        requests:
           cpu: "0.5"
+          memory: "500Mi"
+        requests:
+          cpu: "0.2"
           memory: "100Mi"
+  imagePullSecrets:
+  - name: regcred
 
 ---
 apiVersion: v1
@@ -26,24 +28,23 @@ metadata:
   name: sail-map-api-service
   namespace: oscar-dev
 spec:
-  type: NodePort
   selector:
     app: sail-map-api
   ports:
     - protocol: TCP
-      port: 3000
+      port: 80
       targetPort: 3000
-#---
-#apiVersion: route.openshift.io/v1
-#kind: Route
-#metadata:
-#  name: sail-map-api-route
-#  namespace: oscar-dev
-#spec:
-#  to:
-#    kind: Service
-#    name: sail-map-api-service
-#  port:
-#    targetPort: 80
-#  tls:
-#    termination: edge
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sail-map-api-route
+  namespace: oscar-dev
+spec:
+  to:
+    kind: Service
+    name: sail-map-api-service
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
