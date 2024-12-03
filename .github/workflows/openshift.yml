@@ -47,7 +47,7 @@ env:
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
   IMAGE_REGISTRY: "hub.docker.com/repository/docker/earlybirdreal/sail-map-api"
   IMAGE_REGISTRY_USER: "earlybirdreal"
-  IMAGE_REGISTRY_PASSWORD: "dckr_pat_YyRIykLma8CKcxAjX9XzndA4CS4"
+  IMAGE_REGISTRY_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
   # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
