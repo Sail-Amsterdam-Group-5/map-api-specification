@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'features/**'
+      - dev
     paths:
       - '**.ts'
       - 'deployment.yml'
