@@ -127,6 +127,6 @@ export class UtilitiesController {
   @ApiOkResponse({description: 'This action removes a utility'})
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return;
+    return this.utilitiesService.remove(id);
   }
 }

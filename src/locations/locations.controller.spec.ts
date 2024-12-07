@@ -60,7 +60,7 @@ describe('LocationsController', () => {
       const result = 'This action removes a #1 location';
       jest.spyOn(controller, 'remove').mockImplementation(() => result);
 
-      expect(await controller.remove('1')).toBe(result);
+      expect(controller.remove('1')).toBe(result);
     });
   });
 
