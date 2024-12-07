@@ -54,4 +54,4 @@ spec:
     kind: Service
     name: sail-map-api-service
   port:
-    targetPort: 80
+    targetPort: 3000
