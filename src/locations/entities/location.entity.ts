@@ -4,16 +4,16 @@ import { CosmosDateTime, CosmosPartitionKey } from '@nestjs/azure-database';
 @CosmosPartitionKey('location')
 export class Location {
     @ApiProperty({
-        example: 1,
+        example: '1',
         description: 'The id of the location',
     })
-    id: number;
+    id: string;
     @ApiProperty({
         example: {longtitude: "51.985103", latitude: "5.898730"},
         description: 'The location'
     })
     location: {
-        longtitude: string,
+        longitude: string,
         latitude: string
     }
     @ApiProperty({

@@ -7,7 +7,7 @@ import {Utility} from "./entities/utility.entity";
 export class UtilitiesService {
   create(createUtilityDto: CreateUtilityDto) {
     const utility = new Utility();
-    utility.id = this.getRandomInt(99);
+    utility.id = '1';
     utility.name = createUtilityDto.name
     utility.description = createUtilityDto.description;
     utility.locationId = createUtilityDto.locationId;
@@ -18,25 +18,27 @@ export class UtilitiesService {
   }
 
   findAll() {
-    return [this.generateRandomResponse(), this.generateRandomResponse()];
+    return [this.generateRandomResponse('1'), this.generateRandomResponse('2')];
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.generateRandomResponse(id);
   }
 
   findByTypeAndOrDate(type?: string, date?: string[]) {
+    console.log(type);
+    console.log(date);
     if (type == undefined || date == undefined) {
-      return [this.generateRandomResponse(1, 1), this.generateRandomResponse(2, 2)];
+      return [this.generateRandomResponse('1', 1), this.generateRandomResponse('2', 2)];
     } else if (date == undefined) {
-      return [this.generateRandomResponse(1, 1, type), this.generateRandomResponse(2, 2, type)];
+      return [this.generateRandomResponse('1', 1, type), this.generateRandomResponse('2', 2, type)];
     } else if (type == undefined) {
-      return [this.generateRandomResponse(1, 1, undefined, date), this.generateRandomResponse(2, 2, undefined, date)];
+      return [this.generateRandomResponse('1', 1, undefined, date), this.generateRandomResponse('2', 2, undefined, date)];
     }
-    return [this.generateRandomResponse(1, 1, type, date), this.generateRandomResponse(2, 2, type, date)];
+    return [this.generateRandomResponse('1', 1, type, date), this.generateRandomResponse('2', 2, type, date)];
   }
 
-  update(id: number, updateUtilityDto: UpdateUtilityDto) {
+  update(id: string, updateUtilityDto: UpdateUtilityDto) {
     const utility = new Utility();
     utility.id = id
     utility.name = updateUtilityDto.name
@@ -48,17 +50,17 @@ export class UtilitiesService {
     return utility;;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a ${id} utility`;
   }
 
   private getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
-  private generateRandomResponse(id?: number, locationId?: number, type?: string, dates?: string[]) : Utility {
+  private generateRandomResponse(id?: string, locationId?: number, type?: string, dates?: string[]) : Utility {
     const utility = new Utility();
     if (id == undefined) {
-      utility.id = this.getRandomInt(99);
+      utility.id = this.getRandomInt(99).toString();
     } else {
       utility.id = id;
     }
@@ -76,7 +78,8 @@ export class UtilitiesService {
       utility.type = type;
     }
     if (dates == undefined) {
-      utility.dates = [new Date().toDateString(), new Date().toDateString()];
+      const date = new Date().setDate(new Date().getDate() + 1);
+      utility.dates = [new Date().toDateString(), new Date(date).toDateString()];
     } else {
       console.log(dates);
       utility.dates = []

@@ -20,14 +20,14 @@ export class CreateUtilityDto {
     locationId: number;
 
     @ApiProperty({
+        description: "The dates the utility is available",
+        example: ["2021-09-15", '2021-09-16']
+    })
+    dates: string[];
+
+    @ApiProperty({
         example: "toilet",
         description: 'The type of utility'
     })
     type: string;
-
-    @ApiProperty({
-        description: "The dates the utility is available",
-        example: "2021-09-15T14:00:00Z"
-    })
-    dates: string[];
 }

@@ -6,7 +6,7 @@ export class CreateLocationDto {
         description: 'Coordinates of the location'
     })
     location: {
-        longtitude: string,
+        longitude: string,
         latitude: string
     }
     @ApiProperty({

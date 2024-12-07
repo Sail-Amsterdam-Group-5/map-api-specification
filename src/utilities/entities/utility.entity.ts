@@ -4,10 +4,10 @@ import {CosmosDateTime, CosmosPartitionKey} from "@nestjs/azure-database";
 @CosmosPartitionKey('type')
 export class Utility {
     @ApiProperty({
-        example: 1,
+        example: '1',
         description: 'The id of the utility',
     })
-    id?: number;
+    id?: string;
     @ApiProperty({
         example: 'Toilet Velperplein',
         description: 'The name of the utility'
