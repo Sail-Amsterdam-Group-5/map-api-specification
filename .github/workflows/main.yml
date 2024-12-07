@@ -3,10 +3,10 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - qa
+      - main
   pull_request:
     branches:
-      - qa
+      - main
     types:
       - opened
       - reopened
@@ -93,6 +93,8 @@ jobs:
           oc apply -f openshift/deployment.yml
 
   # Add Load test
+
+  # Add Chaos test
 
   # Do not forget to add the following secrets to your repository:
     # - OPENSHIFT_TOKEN = <your_open_shift_token>
