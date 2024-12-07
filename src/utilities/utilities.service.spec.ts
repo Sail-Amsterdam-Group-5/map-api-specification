@@ -1,7 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UtilitiesService } from './utilities.service';
-import { CreateUtilityDto } from './dto/create-utility.dto';
-import { Utility } from './entities/utility.entity';
 
 describe('UtilitiesService', () => {
   let service: UtilitiesService;

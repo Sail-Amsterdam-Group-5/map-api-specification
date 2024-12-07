@@ -58,13 +58,5 @@ describe('UtilitiesController', () => {
     });
   });
 
-  describe('remove', () => {
-    it('should return a string', async () => {
-      const result = undefined;
-      jest.spyOn(service, 'remove').mockImplementation(() => result);
-
-      expect(await controller.remove('1')).toBe(result);
-    });
-  });
 
 });

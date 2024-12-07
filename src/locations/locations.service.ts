@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import {Utility} from "../utilities/entities/utility.entity";
 import {Location} from "./entities/location.entity";
 
 @Injectable()

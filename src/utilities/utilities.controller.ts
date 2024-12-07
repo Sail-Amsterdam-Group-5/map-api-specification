@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, Query, ParseArrayPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseArrayPipe } from '@nestjs/common';
 import { UtilitiesService } from './utilities.service';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOAuth2, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { ByTypeAndOrDateDto } from './dto/byTypeAndOrDate.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 
 @Controller('utilities')
 export class UtilitiesController {

@@ -1,6 +1,4 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {Location} from "../../locations/entities/location.entity";
-import {CosmosDateTime} from "@nestjs/azure-database";
 
 export class CreateUtilityDto {
     @ApiProperty({

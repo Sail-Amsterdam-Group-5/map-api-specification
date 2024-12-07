@@ -34,8 +34,9 @@ export class UtilitiesService {
       return [this.generateRandomResponse('1', 1, type), this.generateRandomResponse('2', 2, type)];
     } else if (type == undefined) {
       return [this.generateRandomResponse('1', 1, undefined, date), this.generateRandomResponse('2', 2, undefined, date)];
+    } else {
+      return [this.generateRandomResponse('1', 1, type, date), this.generateRandomResponse('2', 2, type, date)];
     }
-    return [this.generateRandomResponse('1', 1, type, date), this.generateRandomResponse('2', 2, type, date)];
   }
 
   update(id: string, updateUtilityDto: UpdateUtilityDto) {
@@ -47,7 +48,7 @@ export class UtilitiesService {
     utility.type = updateUtilityDto.type;
     utility.dates = updateUtilityDto.dates;
     utility.createdAt = new Date();
-    return utility;;
+    return utility;
   }
 
   remove(id: string) {
