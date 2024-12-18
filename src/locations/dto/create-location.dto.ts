@@ -22,7 +22,6 @@ export class CreateLocationDto {
     })
     icon: string;
 
-    // Ocean Red, Green, Yellow, Blue, White, Gray
     @ApiProperty({ enum: ['Red', 'Green', 'Yellow', 'Blue', 'White', 'Gray'], example: 'Red' })
     ocean: Ocean;
 }
