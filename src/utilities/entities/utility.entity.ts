@@ -1,10 +1,11 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {CosmosDateTime, CosmosPartitionKey} from "@nestjs/azure-database";
+import { Location } from '../../locations/entities/location.entity';
 
 @CosmosPartitionKey('type')
 export class Utility {
     @ApiProperty({
-        example: '1',
+        example: '8476f4dc-eefe-458f-9c1d-a849c46da56b',
         description: 'The id of the utility',
     })
     id?: string;
@@ -18,11 +19,22 @@ export class Utility {
         description: 'The description of the utility'
     })
     description: string;
+
     @ApiProperty({
-        example: 1,
-        description: 'The id of the location'
+        example: {
+            "id": "9a83312e-9a65-4f70-828f-9c42655b0f60",
+            "location": {
+                "longtitude": 51.985103,
+                "latitude": 5.89873
+            },
+            "icon": "cheese_wheel",
+            "createdAt": "2024-12-18T12:53:05.282Z",
+            "ocean": "Red",
+            "name": "Velperplein"
+        },
+        description: 'The location object'
     })
-    locationId: number;
+    location: Location;
 
     @ApiProperty({
         description: "The dates the utility is available",

@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
 import {Utility} from "./entities/utility.entity";
+import { Location, Ocean } from '../locations/entities/location.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UtilitiesService {
   create(createUtilityDto: CreateUtilityDto) {
     const utility = new Utility();
-    utility.id = '1';
+    utility.id = this.getRandomId();
     utility.name = createUtilityDto.name
     utility.description = createUtilityDto.description;
-    utility.locationId = createUtilityDto.locationId;
+    utility.location = this.generateLocationResponse(createUtilityDto.locationId);
     utility.type = createUtilityDto.type;
     utility.dates = createUtilityDto.dates;
     utility.createdAt = new Date();
@@ -18,7 +20,7 @@ export class UtilitiesService {
   }
 
   findAll() {
-    return [this.generateRandomResponse('1'), this.generateRandomResponse('2')];
+    return [this.generateRandomResponse(this.getRandomId()), this.generateRandomResponse(this.getRandomId())];
   }
 
   findOne(id: string) {
@@ -29,13 +31,13 @@ export class UtilitiesService {
     console.log(type);
     console.log(date);
     if (type == undefined || date == undefined) {
-      return [this.generateRandomResponse('1', 1), this.generateRandomResponse('2', 2)];
+      return [this.generateRandomResponse(this.getRandomId(), this.getRandomId()), this.generateRandomResponse(this.getRandomId(), this.getRandomId())];
     } else if (date == undefined) {
-      return [this.generateRandomResponse('1', 1, type), this.generateRandomResponse('2', 2, type)];
+      return [this.generateRandomResponse(this.getRandomId(), this.getRandomId(), type), this.generateRandomResponse(this.getRandomId(), this.getRandomId(), type)];
     } else if (type == undefined) {
-      return [this.generateRandomResponse('1', 1, undefined, date), this.generateRandomResponse('2', 2, undefined, date)];
+      return [this.generateRandomResponse(this.getRandomId(), this.getRandomId(), undefined, date), this.generateRandomResponse(this.getRandomId(), this.getRandomId(), undefined, date)];
     } else {
-      return [this.generateRandomResponse('1', 1, type, date), this.generateRandomResponse('2', 2, type, date)];
+      return [this.generateRandomResponse(this.getRandomId(), this.getRandomId(), type, date), this.generateRandomResponse(this.getRandomId(), this.getRandomId(), type, date)];
     }
   }
 
@@ -44,7 +46,7 @@ export class UtilitiesService {
     utility.id = id
     utility.name = updateUtilityDto.name
     utility.description = updateUtilityDto.description;
-    utility.locationId = updateUtilityDto.locationId;
+    utility.location = this.generateLocationResponse(updateUtilityDto.locationId);
     utility.type = updateUtilityDto.type;
     utility.dates = updateUtilityDto.dates;
     utility.createdAt = new Date();
@@ -55,22 +57,22 @@ export class UtilitiesService {
     return `This action removes a ${id} utility`;
   }
 
-  private getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
+  private getRandomId() {
+    return uuidv4();
   }
-  private generateRandomResponse(id?: string, locationId?: number, type?: string, dates?: string[]) : Utility {
+  private generateRandomResponse(id?: string, locationId?: string, type?: string, dates?: string[]) : Utility {
     const utility = new Utility();
     if (id == undefined) {
-      utility.id = this.getRandomInt(99).toString();
+      utility.id = this.getRandomId()
     } else {
       utility.id = id;
     }
     utility.name = 'Toilet Velperplein';
     utility.description = 'This is the toilet at Velperplein which is open from 08:00 till 22:00.';
     if (locationId == undefined) {
-      utility.locationId = this.getRandomInt(99);
+      utility.location = this.generateLocationResponse();
     } else {
-        utility.locationId = locationId;
+        utility.location = this.generateLocationResponse(locationId);
     }
     utility.createdAt = new Date();
     if (type == undefined) {
@@ -91,5 +93,20 @@ export class UtilitiesService {
       })
     }
     return utility;
+  }
+
+  private generateLocationResponse(id?: string) : Location {
+    const location = new Location();
+    if (id == undefined) {
+      location.id = this.getRandomId()
+    } else {
+      location.id = id;
+    }
+    location.location = {longitude: 51.985103, latitude: 5.898730};
+    location.icon = 'cheese_wheel';
+    location.createdAt = new Date();
+    location.ocean = Ocean.Blue;
+    location.name = 'Velperplein';
+    return location;
   }
 }

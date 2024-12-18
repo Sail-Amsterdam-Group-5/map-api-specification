@@ -4,27 +4,43 @@ import { CosmosDateTime, CosmosPartitionKey } from '@nestjs/azure-database';
 @CosmosPartitionKey('location')
 export class Location {
     @ApiProperty({
-        example: '1',
+        example: '8476f4dc-eefe-458f-9c1d-a849c46da56b',
         description: 'The id of the location',
     })
     id: string;
+
+    // Name
     @ApiProperty({
-        example: {longtitude: "51.985103", latitude: "5.898730"},
+        example: 'Velperplein',
+        description: 'The name of the location'
+    })
+    name: string;
+
+    @ApiProperty({
+        example: {longtitude: 51.985103, latitude: 5.898730},
         description: 'The location'
     })
     location: {
-        longitude: string,
-        latitude: string
+        longitude: number,
+        latitude: number
     }
+
+    // Change to Icon. string
     @ApiProperty({
-        example: 'https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263',
-        description: 'The url of an image'
+        example: 'cheese_wheel',
+        description: 'The name of an icon'
     })
-    imageURL: string;
+    icon: string;
 
     @ApiProperty({
         example: '2021-09-15T14:00:00Z',
         description: 'The date and time the location was created'
     })
     @CosmosDateTime() createdAt: Date;
+
+    // Ocean Red, Green, Yellow, Blue, White, Gray
+    @ApiProperty({ enum: ['Red', 'Green', 'Yellow', 'Blue', 'White', 'Gray'], example: 'Red' })
+    ocean: Ocean;
 }
+
+export enum Ocean { Red= 'Red', Green= 'Green', Yellow= 'Yellow', Blue= 'Blue', White= 'White', Gray= 'Gray' }

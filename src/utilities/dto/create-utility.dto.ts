@@ -12,10 +12,10 @@ export class CreateUtilityDto {
     })
     description: string;
     @ApiProperty({
-        example: 1,
+        example: '9a83312e-9a65-4f70-828f-9c42655b0f60',
         description: 'The id of the location'
     })
-    locationId: number;
+    locationId: string;
 
     @ApiProperty({
         description: "The dates the utility is available",

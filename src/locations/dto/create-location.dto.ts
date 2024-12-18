@@ -1,17 +1,28 @@
 import {ApiProperty} from "@nestjs/swagger";
+import { Ocean } from '../entities/location.entity';
 
 export class CreateLocationDto {
     @ApiProperty({
-        example: {longtitude: "51.985103", latitude: "5.898730"},
-        description: 'Coordinates of the location'
+        example: 'Velperplein',
+        description: 'The name of the location'
+    })
+    name: string;
+
+    @ApiProperty({
+        example: {longtitude: 51.985103, latitude: 5.898730},
+        description: 'The location'
     })
     location: {
-        longitude: string,
-        latitude: string
+        longitude: number,
+        latitude: number
     }
     @ApiProperty({
-        example: 'https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263',
-        description: 'The url of an image'
+        example: 'cheese_wheel',
+        description: 'The name of an icon'
     })
-    imageURL: string;
+    icon: string;
+
+    // Ocean Red, Green, Yellow, Blue, White, Gray
+    @ApiProperty({ enum: ['Red', 'Green', 'Yellow', 'Blue', 'White', 'Gray'], example: 'Red' })
+    ocean: Ocean;
 }

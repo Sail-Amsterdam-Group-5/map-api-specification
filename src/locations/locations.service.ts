@@ -1,53 +1,60 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import {Location} from "./entities/location.entity";
+import { Location, Ocean } from './entities/location.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class LocationsService {
   create(createLocationDto: CreateLocationDto) {
     const location = new Location();
-    location.id = '1';
+    location.id = this.getRandomId();
     location.location = createLocationDto.location;
-    location.imageURL = createLocationDto.imageURL;
+    location.icon = createLocationDto.icon;
     location.createdAt = new Date();
+    location.ocean = createLocationDto.ocean;
+    location.name = createLocationDto.name;
     return location;
   }
 
   findAll() {
-    return [this.generateRandomResponse('1'), this.generateRandomResponse('2')];
+    return [this.generateLocationResponse(this.getRandomId()), this.generateLocationResponse(this.getRandomId())];
   }
 
   findOne(id: string) {
-    return this.generateRandomResponse(id)
+    return this.generateLocationResponse(id)
   }
 
   update(id: string, updateLocationDto: UpdateLocationDto) {
     const location = new Location();
     location.id = id;
     location.location = updateLocationDto.location;
-    location.imageURL = updateLocationDto.imageURL;
+    location.icon = updateLocationDto.icon;
     location.createdAt = new Date();
+    location.ocean = updateLocationDto.ocean;
+    location.name = updateLocationDto.name;
     return location;
   }
 
   remove(id: string) {
-    return `This action removes a #${id} location`;
+    return `This action removes a ${id} location`;
   }
 
-  private getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
+  private getRandomId() {
+    return uuidv4();
   }
-  private generateRandomResponse(id?: string) : Location {
+  private generateLocationResponse(id?: string) : Location {
     const location = new Location();
     if (id == undefined) {
-      location.id = this.getRandomInt(99).toString();
+      location.id = this.getRandomId();
     } else {
       location.id = id;
     }
-    location.location = {longitude: '51.985103', latitude: '5.898730'};
-    location.imageURL = 'https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263';
+    location.location = {longitude: 51.985103, latitude: 5.898730};
+    location.icon = 'cheese_wheel';
     location.createdAt = new Date();
+    location.ocean = Ocean.Blue;
+    location.name = 'Velperplein';
     return location;
   }
 }

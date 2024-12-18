@@ -10,13 +10,15 @@ export class LocationsController {
 
   @ApiCreatedResponse({description: 'This action adds a new location', example:
       {
-        "id": 5,
+        "id": "9a83312e-9a65-4f70-828f-9c42655b0f60",
         "location": {
-          "longtitude": "51.985103",
-          "latitude": "5.898730"
+          "longtitude": 51.985103,
+          "latitude": 5.89873
         },
-        "imageURL": "https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263",
-        "createdAt": "2024-12-07T15:52:55.308Z"
+        "icon": "cheese_wheel",
+        "createdAt": "2024-12-18T12:53:05.282Z",
+        "ocean": "Red",
+        "name": "Velperplein"
       }})
   @Post()
   create(@Body() createLocationDto: CreateLocationDto) {
@@ -26,22 +28,26 @@ export class LocationsController {
   @ApiOkResponse({description: 'This action returns all locations', example:
       [
         {
-          "id": 49,
+          "id": "8476f4dc-eefe-458f-9c1d-a849c46da56b",
           "location": {
-            "longitude": "51.985103",
-            "latitude": "5.898730"
+            "longitude": 51.985103,
+            "latitude": 5.89873
           },
-          "imageURL": "https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263",
-          "createdAt": "2024-12-07T15:55:29.303Z"
+          "icon": "cheese_wheel",
+          "createdAt": "2024-12-18T12:53:23.560Z",
+          "ocean": "Blue",
+          "name": "Velperplein"
         },
         {
-          "id": 40,
+          "id": "950bbdf6-32aa-4da7-b34d-83a953fb25c4",
           "location": {
-            "longitude": "51.985103",
-            "latitude": "5.898730"
+            "longitude": 51.985103,
+            "latitude": 5.89873
           },
-          "imageURL": "https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263",
-          "createdAt": "2024-12-07T15:55:29.303Z"
+          "icon": "cheese_wheel",
+          "createdAt": "2024-12-18T12:53:23.560Z",
+          "ocean": "Blue",
+          "name": "Velperplein"
         }
       ]})
   @Get()
@@ -51,13 +57,15 @@ export class LocationsController {
 
   @ApiOkResponse({description: 'This action returns a location', example:
       {
-        "id": 1,
+        "id": "1dafsf3",
         "location": {
-          "longitude": "51.985103",
-          "latitude": "5.898730"
+          "longitude": 51.985103,
+          "latitude": 5.89873
         },
-        "imageURL": "https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263",
-        "createdAt": "2024-12-07T15:55:54.943Z"
+        "icon": "cheese_wheel",
+        "createdAt": "2024-12-18T12:53:39.624Z",
+        "ocean": "Blue",
+        "name": "Velperplein"
       }})
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -67,13 +75,15 @@ export class LocationsController {
 
   @ApiOkResponse({description: 'This action updates a location', example:
       {
-        "id": 75,
+        "id": "14124",
         "location": {
-          "longtitude": "51.985103",
-          "latitude": "5.898730"
+          "longtitude": 51.985103,
+          "latitude": 5.89873
         },
-        "imageURL": "https://cdn.nextgov.com/media/img/cd/2017/05/03/050317sharkNG/route-fifty-lead-image.jpg?1627512263",
-        "createdAt": "2024-12-07T15:56:09.504Z"
+        "icon": "cheese_wheel",
+        "createdAt": "2024-12-18T12:53:53.526Z",
+        "ocean": "Red",
+        "name": "Velperplein"
       }})
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateLocationDto: UpdateLocationDto) {
