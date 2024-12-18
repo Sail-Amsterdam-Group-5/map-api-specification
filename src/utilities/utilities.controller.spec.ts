@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UtilitiesController } from './utilities.controller';
 import { UtilitiesService } from './utilities.service';
 import { Utility } from './entities/utility.entity';
+import { CreateUtilityDto } from './dto/create-utility.dto';
 
 describe('UtilitiesController', () => {
   let controller: UtilitiesController;
@@ -26,7 +27,7 @@ describe('UtilitiesController', () => {
       const result = new Utility();
       jest.spyOn(service, 'create').mockImplementation(() => result);
 
-      expect(await controller.create(new Utility())).toBe(result);
+      expect(await controller.create(new CreateUtilityDto())).toBe(result);
     });
   });
 
