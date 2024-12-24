@@ -81,8 +81,8 @@ export class UtilitiesService {
       utility.type = type;
     }
     if (dates == undefined) {
-      const date = new Date().setDate(new Date().getDate() + 1);
-      utility.dates = [new Date().toDateString(), new Date(date).toDateString()];
+      const date = new Date("2025-08-20").setDate(new Date("2025-08-20").getDate() + 1);
+      utility.dates = [new Date("2025-08-20").toDateString(), new Date(date).toDateString()];
     } else {
       console.log(dates);
       utility.dates = []
