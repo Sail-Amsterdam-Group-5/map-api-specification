@@ -3,14 +3,13 @@ name: Development CI
 on:
   push:
     branches:
-      - 'features/**'
       - dev
     paths:
       - '**.ts'
       - 'deployment.yml'
   pull_request:
     branches:
-      - 'features/**'
+      - dev
     types:
       - opened
       - reopened

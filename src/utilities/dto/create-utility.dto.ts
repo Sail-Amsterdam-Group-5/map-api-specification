@@ -19,7 +19,7 @@ export class CreateUtilityDto {
 
     @ApiProperty({
         description: "The dates the utility is available",
-        example: ["2021-09-15", '2021-09-16']
+        example: ["2025-08-20", '2025-08-21', '2025-08-22', '2025-08-23', '2025-08-24']
     })
     dates: string[];
 
