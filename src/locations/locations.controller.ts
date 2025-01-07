@@ -3,8 +3,6 @@ import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { ApiCreatedResponse, ApiHeader, ApiOkResponse } from '@nestjs/swagger';
-import { IsDefined, IsString } from 'class-validator';
-import { Expose } from 'class-transformer';
 
 @Controller('locations')
 export class LocationsController {
