@@ -25,7 +25,7 @@ export class LocationsController {
     return this.locationsService.create(createLocationDto);
   }
 
-
+// Hoi
   @ApiOkResponse({description: 'This action returns all locations', example:
       [
         {
