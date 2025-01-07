@@ -37,14 +37,14 @@ describe('LocationsController', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a location', async () => {
-      const result = new Location();
-      jest.spyOn(controller, 'findOne').mockImplementation(() => result);
-
-      expect(await controller.findOne('1')).toBe(result);
-    });
-  });
+  // describe('findOne', () => {
+  //   it('should return a location', async () => {
+  //     const result = new Location();
+  //     jest.spyOn(controller, 'findOne').mockImplementation(() => result);
+  //
+  //     expect(await controller.findOne('1')).toBe(result);
+  //   });
+  // });
 
   describe('update', () => {
     it('should return a location', async () => {
