@@ -1,8 +1,10 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Headers } from '@nestjs/common';
 import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import {ApiCreatedResponse, ApiOkResponse} from "@nestjs/swagger";
+import { ApiCreatedResponse, ApiHeader, ApiOkResponse } from '@nestjs/swagger';
+import { IsDefined, IsString } from 'class-validator';
+import { Expose } from 'class-transformer';
 
 @Controller('locations')
 export class LocationsController {
@@ -55,22 +57,22 @@ export class LocationsController {
     return this.locationsService.findAll();
   }
 
-  @ApiOkResponse({description: 'This action returns a location', example:
-      {
-        "id": "1dafsf3",
-        "location": {
-          "longitude": 51.985103,
-          "latitude": 5.89873
-        },
-        "icon": "cheese_wheel",
-        "createdAt": "2024-12-18T12:53:39.624Z",
-        "ocean": "Blue",
-        "name": "Velperplein"
-      }})
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.locationsService.findOne(id);
-  }
+  // @ApiOkResponse({description: 'This action returns a location', example:
+  //     {
+  //       "id": "1dafsf3",
+  //       "location": {
+  //         "longitude": 51.985103,
+  //         "latitude": 5.89873
+  //       },
+  //       "icon": "cheese_wheel",
+  //       "createdAt": "2024-12-18T12:53:39.624Z",
+  //       "ocean": "Blue",
+  //       "name": "Velperplein"
+  //     }})
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.locationsService.findOne(id);
+  // }
 
 
   @ApiOkResponse({description: 'This action updates a location', example:
@@ -94,5 +96,14 @@ export class LocationsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.locationsService.remove(id);
+  }
+
+  @ApiHeader({
+    name: 'X-User-Roles',
+    description: 'Roles of the user',
+  })
+  @Get('headers')
+  getHeaders(@Headers("X-User-Roles") headers) {
+    return headers;
   }
 }
