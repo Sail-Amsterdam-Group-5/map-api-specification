@@ -76,12 +76,12 @@ jobs:
           docker push earlybirdreal/sail-map-api:${{ github.sha }}
 
       # Step 6: Deploy to OpenShift
-      - name: Update values.yaml
+      - name: Update deployment.yml
         run: |
-          cd helm
-          sed -i 's|APP_VERSION:.*|APP_VERSION: '${{ github.sha }}'|' values.yaml 
+          cd openshift
+          sed -i "s|image: your-docker-repo/your-image-name:.*|image: your-docker-repo/your-image-name:${{ github.sha }}|" deployment.yml
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
-          git add values.yaml
-          git commit -m "Update values.yaml"
+          git add deployment.yml
+          git commit -m "Update deployment.yml"
           git push
