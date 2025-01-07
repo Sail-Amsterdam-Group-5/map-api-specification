@@ -24,7 +24,8 @@ export class LocationsController {
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.create(createLocationDto);
   }
-// hey i wanna die
+
+
   @ApiOkResponse({description: 'This action returns all locations', example:
       [
         {
