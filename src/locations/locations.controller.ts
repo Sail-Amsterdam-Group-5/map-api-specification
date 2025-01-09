@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Headers } from '@nes
 import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { ApiCreatedResponse, ApiHeader, ApiOkResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('locations')
 export class LocationsController {
@@ -96,12 +96,8 @@ export class LocationsController {
     return this.locationsService.remove(id);
   }
 
-  @ApiHeader({
-    name: 'X-User-Roles',
-    description: 'Roles of the user',
-  })
   @Get('headers')
-  getHeaders(@Headers("X-User-Roles") headers) {
+  getHeaders(@Headers() headers) {
     return headers;
   }
 }
