@@ -227,6 +227,14 @@ export class UtilitiesService {
         createdAt: new Date(),
         ocean: Ocean.Red,
       },
+      {
+        id: this.getRandomId(),
+        name: 'Ruby Cove',
+        location: { latitude: 52.3660571, longitude: 4.9344881 },
+        icon: 'activity',
+        createdAt: new Date(),
+        ocean: Ocean.Red,
+      },
     ];
 
     const utilities: Utility[] = [
