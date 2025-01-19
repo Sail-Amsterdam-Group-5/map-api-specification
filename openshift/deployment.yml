@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: sail-map-api
-          image: earlybirdreal/sail-map-api:527cb1c8ac3538e2cfb18594cc1a3d033d2412fa
+          image: earlybirdreal/sail-map-api:aaecf78909c692cff7f53e8d7733f70c3e39b9b7
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
