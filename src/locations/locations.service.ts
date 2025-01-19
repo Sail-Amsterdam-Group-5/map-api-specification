@@ -1,43 +1,114 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { Location, Ocean } from './entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { Container, CosmosClient } from '@azure/cosmos';
+import process from 'node:process';
+import { Mapper } from '@automapper/core';
+import { InjectMapper } from '@automapper/nestjs';
+import { ConfigService } from '@nestjs/config';
+import { ReadLocationDto } from './dto/read-location.dto';
 
 @Injectable()
 export class LocationsService {
-  create(createLocationDto: CreateLocationDto) {
-    const location = new Location();
-    location.id = this.getRandomId();
-    location.location = createLocationDto.location;
-    location.icon = createLocationDto.icon;
-    location.createdAt = new Date();
-    location.ocean = createLocationDto.ocean;
-    location.name = createLocationDto.name;
-    return location;
+
+  constructor(
+    @InjectMapper() private readonly classMapper: Mapper,
+    private configService: ConfigService
+  ) {
+    const endpoint = this.configService.get<string>("COSMOSDB_ENDPOINT");
+    const key = this.configService.get<string>("COSMOSDB_KEY");
+
+    this.client = new CosmosClient({ endpoint, key });
+    this.container = this.client.database(this.databaseId).container(this.containerId);
   }
 
-  findAll() {
-    return this.locationGenerator();
+  private readonly client: CosmosClient;
+  private readonly databaseId = this.configService.get<string>("DATABASE_ID"); // Replace with your database ID
+  private readonly containerId = this.configService.get<string>("LOCATION_CONTAINER_ID"); // Replace with your container ID
+  private container: Container;
+
+  async create(createLocationDto: CreateLocationDto) {
+    try {
+      const entity = this.classMapper.map(createLocationDto, CreateLocationDto, Location);
+      entity.longLang = entity.ocean + entity.id;
+      entity.createdAt = new Date();
+      const { resource } = await this.container.items.create(entity);
+      const result = this.classMapper.map(resource, Location, ReadLocationDto);
+      result.location = resource.location;
+      return result;
+    }
+    catch (ex) {
+      throw new Error(`Create error: ${ex.message}.`);
+    }
   }
 
-  findOne(id: string) {
-    return this.generateLocationResponse(id)
+  async findAll() {
+    try {
+      const { resources } = await this.container.items.query('SELECT * from c').fetchAll();
+      console.log('test', resources);
+      return resources.map((resource) => {
+        const result = this.classMapper.map(resource, Location, ReadLocationDto);
+        result.location = resource.location;
+        return result;
+      });
+    } catch (ex) {
+      throw new Error(`Find all error: ${ex.message}.`);
+    }
   }
 
-  update(id: string, updateLocationDto: UpdateLocationDto) {
-    const location = new Location();
-    location.id = id;
-    location.location = updateLocationDto.location;
-    location.icon = updateLocationDto.icon;
-    location.createdAt = new Date();
-    location.ocean = updateLocationDto.ocean;
-    location.name = updateLocationDto.name;
-    return location;
+  async findOne(id: string) {
+    try {
+      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
+      if (resources.length === 0) {
+        throw new Error(`Location with id ${id} not found.`);
+      }
+      const result = this.classMapper.map(resources[0], Location, ReadLocationDto);
+      result.location = resources[0].location;
+      return result;
+    } catch (ex) {
+      throw new HttpException(`Find one error: ${ex.message}`, HttpStatus.NOT_FOUND);
+    }
   }
 
-  remove(id: string) {
-    return `This action removes a ${id} location`;
+  async update(id: string, updateLocationDto: UpdateLocationDto) {
+    // const location = new Location();
+    // location.id = id;
+    // location.location = updateLocationDto.location;
+    // location.icon = updateLocationDto.icon;
+    // location.createdAt = new Date();
+    // location.ocean = updateLocationDto.ocean;
+    // location.name = updateLocationDto.name;
+    try {
+      const entity = this.classMapper.map(updateLocationDto, UpdateLocationDto, Location);
+      console.log('entity', entity);
+      entity.id = id;
+      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
+      console.log('resources', resources);
+      entity.location = updateLocationDto.location;
+      entity.createdAt = resources[0].createdAt;
+      entity.longLang = resources[0].longLang;
+      console.log('entity', entity);
+      const { resource } = await this.container.item(resources[0].id, resources[0].longLang).replace(entity);
+      const result = this.classMapper.map(resource, Location, ReadLocationDto);
+      result.location = resource.location;
+      return result;
+
+    } catch (ex) {
+      throw new Error(`Update error: ${ex.message}.`);
+    }
+    // return location;
+  }
+
+  async remove(id: string) {
+    try {
+      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
+      await this.container.item(resources[0].id, resources[0].longLang).delete();
+      return `This action removes a ${id} location`;
+    } catch (ex) {
+      throw new Error(`Remove error: ${ex.message}.`);
+    }
   }
 
   private getRandomId() {
@@ -56,6 +127,17 @@ export class LocationsService {
     location.ocean = Ocean.Blue;
     location.name = 'Velperplein';
     return location;
+  }
+
+  async mockData() {
+    try {
+      for (const location of this.locationGenerator()) {
+        location.longLang = location.ocean + location.id;
+        await this.container.items.create(location);
+      }
+    } catch (ex) {
+      throw new Error(`Remove error: ${ex.message}.`);
+    }
   }
 
   private locationGenerator(): Location[] {

@@ -28,6 +28,32 @@ spec:
             requests:
               cpu: "0.2"
               memory: "50Mi"
+          env:
+            - name: COSMOSDB_ENDPOINT
+              valueFrom:
+                  secretKeyRef:
+                    name: cosmosdb-secret
+                    key: COSMOSDB-ENDPOINT
+            - name: COSMOSDB_KEY
+              valueFrom:
+                  secretKeyRef:
+                      name: cosmosdb-secret
+                      key: COSMOSDB-KEY
+            - name: DATABASE_ID
+              valueFrom:
+                  secretKeyRef:
+                      name: cosmosdb-secret
+                      key: DATABASE-ID
+            - name: LOCATION_CONTAINER_ID
+              valueFrom:
+                  secretKeyRef:
+                      name: cosmosdb-secret
+                      key: LOCATION-CONTAINER-ID
+            - name: UTILITY_CONTAINER_ID
+              valueFrom:
+                  secretKeyRef:
+                      name: cosmosdb-secret
+                      key: UTILITY-CONTAINER-ID
       imagePullSecrets:
       - name: regcred
 

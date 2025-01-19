@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
 import {Utility} from "./entities/utility.entity";
 import { Location, Ocean } from '../locations/entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { InjectMapper } from '@automapper/nestjs';
+import { Mapper } from '@automapper/core';
+import { ConfigService } from '@nestjs/config';
+import { Container, CosmosClient } from '@azure/cosmos';
+import { ReadUtilityDto } from './dto/read-utility.dto';
+import { LocationsService } from '../locations/locations.service';
 
 @Injectable()
 export class UtilitiesService {
-  create(createUtilityDto: CreateUtilityDto) {
-    const utility = new Utility();
-    utility.id = this.getRandomId();
-    utility.name = createUtilityDto.name
-    utility.description = createUtilityDto.description;
-    utility.location = this.generateLocationResponse(createUtilityDto.locationId);
-    utility.type = createUtilityDto.type;
-    utility.dates = createUtilityDto.dates;
-    utility.createdAt = new Date();
-    return utility;
+  constructor(
+    @InjectMapper() private readonly classMapper: Mapper,
+    private configService: ConfigService,
+    private locationService: LocationsService
+  ) {
+    const endpoint = this.configService.get<string>("COSMOSDB_ENDPOINT");
+    const key = this.configService.get<string>("COSMOSDB_KEY");
+
+    this.client = new CosmosClient({ endpoint, key });
+    this.container = this.client.database(this.databaseId).container(this.containerId);
   }
 
-  findAll() {
-    return this.utilitiesGenerator();
+  private readonly client: CosmosClient;
+  private readonly databaseId = this.configService.get<string>("DATABASE_ID"); // Replace with your database ID
+  private readonly containerId = this.configService.get<string>("UTILITY_CONTAINER_ID"); // Replace with your container ID
+  private container: Container;
+
+  async create(createUtilityDto: CreateUtilityDto) {
+    try {
+
+      const entity = this.classMapper.map(createUtilityDto, CreateUtilityDto, Utility);
+      entity.typeId = entity.type + entity.id;
+      entity.dates = createUtilityDto.dates;
+      const location = await this.locationService.findOne(createUtilityDto.locationId);
+      if (location == undefined) {
+        throw new Error('Location not found.');
+      }
+      console.log(entity);
+      const { resource } = await this.container.items.create(entity);
+      const result = this.classMapper.map(resource, Utility, ReadUtilityDto);
+      result.dates = resource.dates;
+      result.location = location;
+      return result;
+    } catch (ex) {
+      throw new HttpException(`Create error: ${ex.message}`, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAll() {
+    try {
+      const { resources } = await this.container.items.query('SELECT * from c').fetchAll();
+      console.log('test', resources);
+      const res = await Promise.all(resources.map(async (resource) => {
+        const result = this.classMapper.map(resource, Utility, ReadUtilityDto);
+        result.location = await this.locationService.findOne(resource.locationId);
+        result.dates = resource.dates;
+        console.log(result);
+        return result;
+      }));
+      console.log(res);
+      return res;
+    } catch (ex) {
+      throw new Error(`Find all error: ${ex.message}.`);
+    }
   }
 
   findOne(id: string) {

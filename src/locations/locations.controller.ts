@@ -55,22 +55,22 @@ export class LocationsController {
     return this.locationsService.findAll();
   }
 
-  // @ApiOkResponse({description: 'This action returns a location', example:
-  //     {
-  //       "id": "1dafsf3",
-  //       "location": {
-  //         "longitude": 51.985103,
-  //         "latitude": 5.89873
-  //       },
-  //       "icon": "cheese_wheel",
-  //       "createdAt": "2024-12-18T12:53:39.624Z",
-  //       "ocean": "Blue",
-  //       "name": "Velperplein"
-  //     }})
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.locationsService.findOne(id);
-  // }
+  @ApiOkResponse({description: 'This action returns a location', example:
+      {
+        "id": "1dafsf3",
+        "location": {
+          "longitude": 51.985103,
+          "latitude": 5.89873
+        },
+        "icon": "cheese_wheel",
+        "createdAt": "2024-12-18T12:53:39.624Z",
+        "ocean": "Blue",
+        "name": "Velperplein"
+      }})
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.locationsService.findOne(id);
+  }
 
 
   @ApiOkResponse({description: 'This action updates a location', example:
@@ -96,8 +96,14 @@ export class LocationsController {
     return this.locationsService.remove(id);
   }
 
-  @Get('headers')
-  getHeaders(@Headers() headers) {
-    return headers;
+  @ApiOkResponse({description: 'This action creates mock data'})
+  @Post('mock')
+  createMockData() {
+    return this.locationsService.mockData();
   }
+
+  // @Get('headers')
+  // getHeaders(@Headers() headers) {
+  //   return headers;
+  // }
 }
