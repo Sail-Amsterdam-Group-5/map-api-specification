@@ -114,6 +114,8 @@ export class LocationsService {
   private getRandomId() {
     return uuidv4();
   }
+
+  // Kill me please
   private generateLocationResponse(id?: string) : Location {
     const location = new Location();
     if (id == undefined) {
