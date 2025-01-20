@@ -38,6 +38,14 @@ jobs:
           node-version: 20.x
           cache: npm
       - run: npm install
+      - name: create env file
+        run: |
+          touch .env
+          echo COSMOSDB_ENDPOINT=${{ secrets.COSMOSDB_ENDPOINT }} >> .env
+          echo COSMOSDB_KEY=${{ secrets.COSMOSDB_KEY }} >> .env
+          echo DATABASE_ID=${{ secrets.DATABASE_ID }} >> .env
+          echo LOCATION_CONTAINER_ID=${{ secrets.LOCATION_CONTAINER_ID }} >> .env
+          echo UTILITY_CONTAINER_ID=${{ secrets.UTILITY_CONTAINER_ID }} >> .env
       - run: npm run test
 
   deploy:
