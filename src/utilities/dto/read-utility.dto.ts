@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CosmosDateTime, CosmosPartitionKey } from '@nestjs/azure-database';
-import { Location } from '../../locations/entities/location.entity';
 import { AutoMap } from '@automapper/classes';
+import { CosmosDateTime } from '@nestjs/azure-database';
+import { Location } from '../../locations/entities/location.entity';
 
-@CosmosPartitionKey('type')
-export class Utility {
+export class ReadUtilityDto {
   @AutoMap()
   @ApiProperty({
     example: '8476f4dc-eefe-458f-9c1d-a849c46da56b',
@@ -42,9 +41,7 @@ export class Utility {
     },
     description: 'The location object',
   })
-  locationId?: string;
-
-  location?: Location;
+  location: Location;
 
   @AutoMap()
   @ApiProperty({
@@ -69,7 +66,4 @@ export class Utility {
   @AutoMap()
   @CosmosDateTime()
   createdAt?: Date;
-
-  @AutoMap()
-  typeId?: string;
 }

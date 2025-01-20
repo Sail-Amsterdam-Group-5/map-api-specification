@@ -1,8 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UtilitiesController } from './utilities.controller';
 import { UtilitiesService } from './utilities.service';
-import { Utility } from './entities/utility.entity';
 import { CreateUtilityDto } from './dto/create-utility.dto';
+import { ReadUtilityDto } from './dto/read-utility.dto';
+import { UpdateUtilityDto } from './dto/update-utility.dto';
+import { AutomapperModule } from '@automapper/nestjs';
+import { classes } from '@automapper/classes';
+import { ConfigModule } from '@nestjs/config';
+import { LocationsService } from '../locations/locations.service';
 
 describe('UtilitiesController', () => {
   let controller: UtilitiesController;
@@ -11,7 +16,11 @@ describe('UtilitiesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UtilitiesController],
-      providers: [UtilitiesService],
+      providers: [UtilitiesService, LocationsService],
+      imports: [
+        AutomapperModule.forRoot({ strategyInitializer: classes() }),
+        ConfigModule.forRoot({ isGlobal: true }),
+      ],
     }).compile();
 
     controller = module.get<UtilitiesController>(UtilitiesController);
@@ -24,18 +33,17 @@ describe('UtilitiesController', () => {
 
   describe('create', () => {
     it('should return a utility', async () => {
-      const result = new Utility();
-      jest.spyOn(service, 'create').mockImplementation(() => result);
+      const result = new ReadUtilityDto();
+      jest.spyOn(service, 'create').mockImplementation(async () => result);
 
       expect(await controller.create(new CreateUtilityDto())).toBe(result);
     });
   });
 
-
   describe('findAll', () => {
     it('should return an array of utilities', async () => {
-      const result = [new Utility()];
-      jest.spyOn(service, 'findAll').mockImplementation(() => result);
+      const result = [new ReadUtilityDto()];
+      jest.spyOn(service, 'findAll').mockImplementation(async () => result);
 
       expect(await controller.findAll()).toBe(result);
     });
@@ -43,8 +51,8 @@ describe('UtilitiesController', () => {
 
   describe('findOne', () => {
     it('should return a utility', async () => {
-      const result = new Utility();
-      jest.spyOn(service, 'findOne').mockImplementation(() => result);
+      const result = new ReadUtilityDto();
+      jest.spyOn(service, 'findOne').mockImplementation(async () => result);
 
       expect(await controller.findOne('1')).toBe(result);
     });
@@ -52,10 +60,10 @@ describe('UtilitiesController', () => {
 
   describe('update', () => {
     it('should return a utility', async () => {
-      const result = new Utility();
-      jest.spyOn(service, 'update').mockImplementation(() => result);
+      const result = new ReadUtilityDto();
+      jest.spyOn(service, 'update').mockImplementation(async () => result);
 
-      expect(await controller.update('1', new Utility())).toBe(result);
+      expect(await controller.update('1', new UpdateUtilityDto())).toBe(result);
     });
   });
 
@@ -67,5 +75,4 @@ describe('UtilitiesController', () => {
       expect(controller.remove('1')).toBe(result);
     });
   });
-
 });

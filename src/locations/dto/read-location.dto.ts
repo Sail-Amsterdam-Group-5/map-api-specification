@@ -1,9 +1,21 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { CosmosDateTime, CosmosPartitionKey } from '@nestjs/azure-database';
-import { AutoMap } from '@automapper/classes';
+// {
+//   "id": "9a83312e-9a65-4f70-828f-9c42655b0f60",
+//   "location": {
+//   "longtitude": 51.985103,
+//     "latitude": 5.89873
+// },
+//   "icon": "cheese_wheel",
+//   "createdAt": "2024-12-18T12:53:05.282Z",
+//   "ocean": "Red",
+//   "name": "Velperplein"
+// }
 
-@CosmosPartitionKey('location')
-export class Location {
+import { ApiProperty } from '@nestjs/swagger';
+import { Ocean } from '../entities/location.entity';
+import { AutoMap } from '@automapper/classes';
+import { CosmosDateTime } from '@nestjs/azure-database';
+
+export class ReadLocationDto {
   @AutoMap()
   @ApiProperty({
     example: '8476f4dc-eefe-458f-9c1d-a849c46da56b',
@@ -11,16 +23,12 @@ export class Location {
   })
   id: string;
 
-  // Name
   @AutoMap()
   @ApiProperty({
     example: 'Velperplein',
     description: 'The name of the location',
   })
   name: string;
-
-  @AutoMap()
-  longLang?: string;
 
   @AutoMap()
   @ApiProperty({
@@ -32,7 +40,6 @@ export class Location {
     latitude: number;
   };
 
-  // Change to Icon. string
   @AutoMap()
   @ApiProperty({
     example: 'cheese_wheel',
@@ -49,19 +56,9 @@ export class Location {
   createdAt?: Date;
 
   @AutoMap()
-  // Ocean Red, Green, Yellow, Blue, White, Gray
   @ApiProperty({
     enum: ['Red', 'Green', 'Yellow', 'Blue', 'White', 'Gray'],
     example: 'Red',
   })
   ocean: Ocean;
-}
-
-export enum Ocean {
-  Red = 'Red',
-  Green = 'Green',
-  Yellow = 'Yellow',
-  Blue = 'Blue',
-  White = 'White',
-  Gray = 'Gray',
 }

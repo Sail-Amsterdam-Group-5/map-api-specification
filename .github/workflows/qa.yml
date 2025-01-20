@@ -38,9 +38,15 @@ jobs:
           node-version: 20.x
           cache: npm
       - run: npm install
+      - name: create env file
+        run: |
+          touch .env
+          echo COSMOSDB_ENDPOINT=${{ secrets.COSMOSDB_ENDPOINT }} >> .env
+          echo COSMOSDB_KEY=${{ secrets.COSMOSDB_KEY }} >> .env
+          echo DATABASE_ID=${{ secrets.DATABASE_ID }} >> .env
+          echo LOCATION_CONTAINER_ID=${{ secrets.LOCATION_CONTAINER_ID }} >> .env
+          echo UTILITY_CONTAINER_ID=${{ secrets.UTILITY_CONTAINER_ID }} >> .env
       - run: npm run test
-
-  # add Integration test
 
   e2e-test:
     runs-on: ubuntu-latest
@@ -52,53 +58,43 @@ jobs:
           node-version: 20.x
           cache: npm
       - run: npm install
+      - name: create env file
+        run: |
+          touch .env
+          echo COSMOSDB_ENDPOINT=${{ secrets.COSMOSDB_ENDPOINT }} >> .env
+          echo COSMOSDB_KEY=${{ secrets.COSMOSDB_KEY }} >> .env
+          echo DATABASE_ID=${{ secrets.DATABASE_ID }} >> .env
+          echo LOCATION_CONTAINER_ID=${{ secrets.LOCATION_CONTAINER_ID }} >> .env
+          echo UTILITY_CONTAINER_ID=${{ secrets.UTILITY_CONTAINER_ID }} >> .env
       - run: npm run test:2e2
 
 
   deploy:
+
+    needs: [ linting, test, e2e-test ]
+
     runs-on: ubuntu-latest
 
-    needs: [linting, test, e2e-test]
-    if: |
-      (needs.linting.result == 'success') && (needs.test.result == 'success') && (needs.e2e-test.result == 'success')
 
     steps:
       # Step 1: Check out the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up OpenShift CLI
-      - name: Install OpenShift CLI
-        run: |
-          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz | tar -xz -C /usr/local/bin
-          oc version
-
-      # Step 3: Log in to OpenShift
-      - name: Log in to OpenShift
-        run: |
-          oc login --token=${{ secrets.OPENSHIFT_TOKEN }} --server=${{ secrets.OPENSHIFT_SERVER }}
-
-      # Step 4: Switch to the target namespace/project
-      - name: Switch namespace
-        run: |
-          oc project oscar-dev
-
-      # Step 5: Build and Push Docker Image
+      # Step 2: Build and Push Docker Image
       - name: Build and push Docker image
         run: |
-          docker build -t earlybirdreal/sail-map-api:latest .
+          docker build -t earlybirdreal/sail-map-api:${{ github.sha }} .
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login --username ${{ secrets.DOCKER_ID }} --password-stdin
-          docker push earlybirdreal/sail-map-api:latest
+          docker push earlybirdreal/sail-map-api:${{ github.sha }}
 
-      # Step 6: Deploy to OpenShift
-      - name: Apply deployment configuration
+      # Step 3: Update Deployment.yml
+      - name: Update deployment.yml
         run: |
-          oc apply -f openshift/deployment.yml
-
-  # Add Load test
-
-  # Do not forget to add the following secrets to your repository:
-    # - OPENSHIFT_TOKEN = <your_open_shift_token>
-    # - OPENSHIFT_SERVER = <your_open_shift_server>
-    # - DOCKER_ID = <your_docker_hub_id>
-    # - DOCKER_TOKEN = <your_docker_hub_token>
+          cd openshift
+          sed -i "s|image: earlybirdreal/sail-map-api:.*|image: earlybirdreal/sail-map-api:${{ github.sha }}|" deployment.yml
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add deployment.yml
+          git commit -m "Update deployment.yml"
+          git push
