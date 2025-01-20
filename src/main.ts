@@ -6,8 +6,6 @@ if (process.env.NODE_ENV !== 'production') import ('dotenv').then((dotenv) => do
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-
-
   const config = new DocumentBuilder()
       .setTitle('Sail Map API')
       .setDescription('The Sail Map API description')
