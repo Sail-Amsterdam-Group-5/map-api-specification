@@ -5,6 +5,8 @@ import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
 import { UtilitiesProfile } from '../profiles/utilities.profile';
 import { LocationsService } from '../locations/locations.service';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { AppModule } from '../app.module';
 import { PromModule } from '../prom/prom.module';
 
 @Module({

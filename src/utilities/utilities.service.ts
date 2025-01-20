@@ -19,7 +19,7 @@ export class UtilitiesService {
     @InjectMapper() private readonly classMapper: Mapper,
     private configService: ConfigService,
     private locationService: LocationsService,
-    @InjectMetric('nodejs_active_requests') public counter: Counter<string>,
+    // @InjectMetric('nodejs_active_requests') public counter: Counter<string>,
   ) {
     const endpoint = this.configService.get<string>('COSMOSDB_ENDPOINT');
     const key = this.configService.get<string>('COSMOSDB_KEY');
@@ -38,7 +38,7 @@ export class UtilitiesService {
   private container: Container;
 
   async create(createUtilityDto: CreateUtilityDto) {
-    this.counter.inc(1);
+    // this.counter.inc(1);
     try {
       const entity = this.classMapper.map(
         createUtilityDto,
@@ -57,10 +57,10 @@ export class UtilitiesService {
       const result = this.classMapper.map(resource, Utility, ReadUtilityDto);
       result.dates = resource.dates;
       result.location = location;
-      this.counter.inc(-1);
+      // this.counter.inc(-1);
       return result;
     } catch (ex) {
-      this.counter.inc(-1);
+      // this.counter.inc(-1);
       throw new HttpException(
         `Create error: ${ex.message}`,
         HttpStatus.BAD_REQUEST,
@@ -69,7 +69,7 @@ export class UtilitiesService {
   }
 
   async findAll() {
-    this.counter.inc(1);
+    // this.counter.inc(1);
     try {
       const { resources } = await this.container.items
         .query('SELECT * from c')
@@ -88,10 +88,10 @@ export class UtilitiesService {
           return result;
         }),
       );
-      this.counter.inc(-1);
+      // this.counter.inc(-1);
       return res;
     } catch (ex) {
-      this.counter.inc(-1);
+      // this.counter.inc(-1);
       throw new Error(`Find all error: ${ex.message}.`);
     }
   }
