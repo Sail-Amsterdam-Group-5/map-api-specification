@@ -17,16 +17,16 @@ spec:
     spec:
       containers:
         - name: sail-map-api
-          image: earlybirdreal/sail-map-api:516b649aff2d9569fa2c5f1bce69a2bd7fc87139
+          image: earlybirdreal/sail-map-api:aaecf78909c692cff7f53e8d7733f70c3e39b9b7
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
           resources:
             limits:
-              cpu: "0.49"
+              cpu: "0.1"
               memory: "499Mi"
             requests:
-              cpu: "0.2"
+              cpu: "0.05"
               memory: "50Mi"
           env:
             - name: COSMOSDB_ENDPOINT
