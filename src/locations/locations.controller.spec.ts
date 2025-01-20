@@ -63,5 +63,4 @@ describe('LocationsController', () => {
       expect(controller.remove('1')).toBe(result);
     });
   });
-
 });

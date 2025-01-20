@@ -4,7 +4,6 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 import { Location, Ocean } from './entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Container, CosmosClient } from '@azure/cosmos';
-import process from 'node:process';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { ConfigService } from '@nestjs/config';
@@ -12,44 +11,55 @@ import { ReadLocationDto } from './dto/read-location.dto';
 
 @Injectable()
 export class LocationsService {
-
   constructor(
     @InjectMapper() private readonly classMapper: Mapper,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {
-    const endpoint = this.configService.get<string>("COSMOSDB_ENDPOINT");
-    const key = this.configService.get<string>("COSMOSDB_KEY");
+    const endpoint = this.configService.get<string>('COSMOSDB_ENDPOINT');
+    const key = this.configService.get<string>('COSMOSDB_KEY');
 
     this.client = new CosmosClient({ endpoint, key });
-    this.container = this.client.database(this.databaseId).container(this.containerId);
+    this.container = this.client
+      .database(this.databaseId)
+      .container(this.containerId);
   }
 
   private readonly client: CosmosClient;
-  private readonly databaseId = this.configService.get<string>("DATABASE_ID"); // Replace with your database ID
-  private readonly containerId = this.configService.get<string>("LOCATION_CONTAINER_ID"); // Replace with your container ID
+  private readonly databaseId = this.configService.get<string>('DATABASE_ID'); // Replace with your database ID
+  private readonly containerId = this.configService.get<string>(
+    'LOCATION_CONTAINER_ID',
+  ); // Replace with your container ID
   private container: Container;
 
   async create(createLocationDto: CreateLocationDto) {
     try {
-      const entity = this.classMapper.map(createLocationDto, CreateLocationDto, Location);
+      const entity = this.classMapper.map(
+        createLocationDto,
+        CreateLocationDto,
+        Location,
+      );
       entity.longLang = entity.ocean + entity.id;
       entity.createdAt = new Date();
       const { resource } = await this.container.items.create(entity);
       const result = this.classMapper.map(resource, Location, ReadLocationDto);
       result.location = resource.location;
       return result;
-    }
-    catch (ex) {
+    } catch (ex) {
       throw new Error(`Create error: ${ex.message}.`);
     }
   }
 
   async findAll() {
     try {
-      const { resources } = await this.container.items.query('SELECT * from c').fetchAll();
-      console.log('test', resources);
+      const { resources } = await this.container.items
+        .query('SELECT * from c')
+        .fetchAll();
       return resources.map((resource) => {
-        const result = this.classMapper.map(resource, Location, ReadLocationDto);
+        const result = this.classMapper.map(
+          resource,
+          Location,
+          ReadLocationDto,
+        );
         result.location = resource.location;
         return result;
       });
@@ -60,15 +70,24 @@ export class LocationsService {
 
   async findOne(id: string) {
     try {
-      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
+      const { resources } = await this.container.items
+        .query('SELECT * from c WHERE c.id = "' + id + '"')
+        .fetchNext();
       if (resources.length === 0) {
         throw new Error(`Location with id ${id} not found.`);
       }
-      const result = this.classMapper.map(resources[0], Location, ReadLocationDto);
+      const result = this.classMapper.map(
+        resources[0],
+        Location,
+        ReadLocationDto,
+      );
       result.location = resources[0].location;
       return result;
     } catch (ex) {
-      throw new HttpException(`Find one error: ${ex.message}`, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `Find one error: ${ex.message}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -81,20 +100,24 @@ export class LocationsService {
     // location.ocean = updateLocationDto.ocean;
     // location.name = updateLocationDto.name;
     try {
-      const entity = this.classMapper.map(updateLocationDto, UpdateLocationDto, Location);
-      console.log('entity', entity);
+      const entity = this.classMapper.map(
+        updateLocationDto,
+        UpdateLocationDto,
+        Location,
+      );
       entity.id = id;
-      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
-      console.log('resources', resources);
+      const { resources } = await this.container.items
+        .query('SELECT * from c WHERE c.id = "' + id + '"')
+        .fetchNext();
       entity.location = updateLocationDto.location;
       entity.createdAt = resources[0].createdAt;
       entity.longLang = resources[0].longLang;
-      console.log('entity', entity);
-      const { resource } = await this.container.item(resources[0].id, resources[0].longLang).replace(entity);
+      const { resource } = await this.container
+        .item(resources[0].id, resources[0].longLang)
+        .replace(entity);
       const result = this.classMapper.map(resource, Location, ReadLocationDto);
       result.location = resource.location;
       return result;
-
     } catch (ex) {
       throw new Error(`Update error: ${ex.message}.`);
     }
@@ -103,8 +126,12 @@ export class LocationsService {
 
   async remove(id: string) {
     try {
-      const { resources } = await this.container.items.query('SELECT * from c WHERE c.id = "' + id + '"').fetchNext();
-      await this.container.item(resources[0].id, resources[0].longLang).delete();
+      const { resources } = await this.container.items
+        .query('SELECT * from c WHERE c.id = "' + id + '"')
+        .fetchNext();
+      await this.container
+        .item(resources[0].id, resources[0].longLang)
+        .delete();
       return `This action removes a ${id} location`;
     } catch (ex) {
       throw new Error(`Remove error: ${ex.message}.`);
@@ -116,14 +143,14 @@ export class LocationsService {
   }
 
   // Kill me please
-  private generateLocationResponse(id?: string) : Location {
+  private generateLocationResponse(id?: string): Location {
     const location = new Location();
     if (id == undefined) {
       location.id = this.getRandomId();
     } else {
       location.id = id;
     }
-    location.location = {longitude: 51.985103, latitude: 5.898730};
+    location.location = { longitude: 51.985103, latitude: 5.89873 };
     location.icon = 'cheese_wheel';
     location.createdAt = new Date();
     location.ocean = Ocean.Blue;
@@ -147,7 +174,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Blue Harbor',
-        location: { latitude: 52.396708, longitude: 4.8791273 },
+        location: { latitude: 52.3995, longitude: 4.8702 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.Blue,
@@ -155,7 +182,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Azure Port',
-        location: { latitude: 52.4033065, longitude: 4.8754366 },
+        location: { latitude: 52.4058, longitude: 4.8762 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.Blue,
@@ -163,7 +190,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Sapphire Bay',
-        location: { latitude: 52.4108988, longitude: 4.8740633 },
+        location: { latitude: 52.4085, longitude: 4.8725 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.Blue,
@@ -171,7 +198,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Emerald Shore',
-        location: { latitude: 52.4091884, longitude: 4.8774107 },
+        location: { latitude: 52.4011, longitude: 4.89 },
         icon: 'drink',
         createdAt: new Date(),
         ocean: Ocean.Green,
@@ -179,7 +206,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Verdant Cove',
-        location: { latitude: 52.3948399, longitude: 4.8951776 },
+        location: { latitude: 52.4039, longitude: 4.8868 },
         icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Green,
@@ -187,7 +214,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Snowy Haven',
-        location: { latitude: 52.3987874, longitude: 4.8961067 },
+        location: { latitude: 52.3912, longitude: 4.9003 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.White,
@@ -195,7 +222,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Frosty Beach',
-        location: { latitude: 52.3845927, longitude: 4.8994541 },
+        location: { latitude: 52.3868, longitude: 4.905 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.White,
@@ -203,7 +230,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Iceberg Point',
-        location: { latitude: 52.3964307, longitude: 4.9029732 },
+        location: { latitude: 52.3894, longitude: 4.9001 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.White,
@@ -211,7 +238,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Golden Sands',
-        location: { latitude: 52.3780592, longitude: 4.8986108 },
+        location: { latitude: 52.3806, longitude: 4.9201 },
         icon: 'drink',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
@@ -219,7 +246,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Amber Cove',
-        location: { latitude: 52.376435, longitude: 4.9145754 },
+        location: { latitude: 52.3788, longitude: 4.9153 },
         icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
@@ -227,7 +254,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Citrine Bay',
-        location: { latitude: 52.3741818, longitude: 4.9332864 },
+        location: { latitude: 52.3769, longitude: 4.93 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
@@ -235,7 +262,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Scarlet Reef',
-        location: { latitude: 52.3707233, longitude: 4.9088247 },
+        location: { latitude: 52.369, longitude: 4.9201 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.Red,
@@ -243,7 +270,7 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Crimson Bay',
-        location: { latitude: 52.3640675, longitude: 4.9206693 },
+        location: { latitude: 52.3678, longitude: 4.9263 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.Red,
@@ -251,8 +278,16 @@ export class LocationsService {
       {
         id: this.getRandomId(),
         name: 'Ruby Shore',
-        location: { latitude: 52.3660591, longitude: 4.9344881 },
+        location: { latitude: 52.3715, longitude: 4.9295 },
         icon: 'drink',
+        createdAt: new Date(),
+        ocean: Ocean.Red,
+      },
+      {
+        id: this.getRandomId(),
+        name: 'Ruby Cove',
+        location: { latitude: 52.369, longitude: 4.9279 },
+        icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Red,
       },

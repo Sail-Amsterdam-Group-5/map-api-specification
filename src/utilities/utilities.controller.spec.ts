@@ -31,7 +31,6 @@ describe('UtilitiesController', () => {
     });
   });
 
-
   describe('findAll', () => {
     it('should return an array of utilities', async () => {
       const result = [new Utility()];
@@ -67,5 +66,4 @@ describe('UtilitiesController', () => {
       expect(controller.remove('1')).toBe(result);
     });
   });
-
 });

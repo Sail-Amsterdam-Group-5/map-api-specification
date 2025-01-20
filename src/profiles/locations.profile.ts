@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
-import { createMap, forMember, ignore, mapFrom, Mapper } from '@automapper/core';
+import {
+  createMap,
+  forMember,
+  ignore,
+  mapFrom,
+  Mapper,
+} from '@automapper/core';
 import { Location } from '../locations/entities/location.entity';
 import { CreateLocationDto } from '../locations/dto/create-location.dto';
 import { UpdateLocationDto } from '../locations/dto/update-location.dto';
@@ -16,22 +22,38 @@ export class LocationsProfile extends AutomapperProfile {
   override get profile() {
     return (mapper) => {
       createMap(mapper, Location, ReadLocationDto);
-      createMap(mapper, CreateLocationDto, Location,
+      createMap(
+        mapper,
+        CreateLocationDto,
+        Location,
         forMember((dest) => dest.id, ignore()),
         forMember((dest) => dest.createdAt, ignore()),
-        forMember((dest) => dest.location, mapFrom((src) => {
-        return src.location;
-        })),
-        forMember((dest) => dest.id, mapFrom((src) => {
-          return uuidv4();
-        })),
-      )
-      createMap(mapper, UpdateLocationDto, Location,
+        forMember(
+          (dest) => dest.location,
+          mapFrom((src) => {
+            return src.location;
+          }),
+        ),
+        forMember(
+          (dest) => dest.id,
+          mapFrom(() => {
+            return uuidv4();
+          }),
+        ),
+      );
+      createMap(
+        mapper,
+        UpdateLocationDto,
+        Location,
         forMember((dest) => dest.id, ignore()),
         forMember((dest) => dest.createdAt, ignore()),
-        forMember((dest) => dest.location, mapFrom((src) => {
-          return src.location;
-        })),);
+        forMember(
+          (dest) => dest.location,
+          mapFrom((src) => {
+            return src.location;
+          }),
+        ),
+      );
     };
   }
 }
