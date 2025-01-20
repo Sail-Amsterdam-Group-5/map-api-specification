@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
 import { Utility } from './entities/utility.entity';
-import { Location, Ocean } from '../locations/entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
@@ -10,7 +9,6 @@ import { ConfigService } from '@nestjs/config';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { ReadUtilityDto } from './dto/read-utility.dto';
 import { LocationsService } from '../locations/locations.service';
-import { CreateLocationDto } from '../locations/dto/create-location.dto';
 
 @Injectable()
 export class UtilitiesService {
@@ -189,18 +187,15 @@ export class UtilitiesService {
 
   async mockData() {
     try {
-      const locations = this.locationsGenerator();
       for (const utility of this.utilitiesGenerator()) {
-        utility.typeId = utility.typeId + utility.id;
-        const test: CreateLocationDto = new CreateLocationDto();
-        test.location = locations[0].location
-        test.name = locations[0].name;
-        test.icon = locations[0].icon;
-        test.ocean = locations[0].ocean;
-        await this.locationService.create(test);
-        utility.locationId = locations[0].id;
-        locations.shift();
-        await this.container.items.create(utility);
+        utility.typeId = utility.type + utility.id;
+        const test = new CreateUtilityDto();
+        test.dates = utility.dates;
+        test.description = utility.description;
+        test.locationId = utility.locationId;
+        test.name = utility.name;
+        test.type = utility.type;
+        await this.create(test);
       }
     } catch (ex) {
       throw new Error(`Mock error: ${ex.message}.`);
@@ -211,127 +206,126 @@ export class UtilitiesService {
     return uuidv4();
   }
 
-  private locationsGenerator(): Location[] {
-    const locations = [
-      {
-        id: this.getRandomId(),
-        name: 'Blue Lagoon',
-        location: { latitude: 52.398, longitude: 4.872 },
-        icon: 'toilet',
-        createdAt: new Date(),
-        ocean: Ocean.Blue,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Azure Haven',
-        location: { latitude: 52.4045, longitude: 4.8745 },
-        icon: 'info',
-        createdAt: new Date(),
-        ocean: Ocean.Blue,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Sapphire Shore',
-        location: { latitude: 52.407, longitude: 4.8715 },
-        icon: 'food',
-        createdAt: new Date(),
-        ocean: Ocean.Blue,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Emerald Lagoon',
-        location: { latitude: 52.4, longitude: 4.888 },
-        icon: 'drink',
-        createdAt: new Date(),
-        ocean: Ocean.Green,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Verdant Point',
-        location: { latitude: 52.4025, longitude: 4.8875 },
-        icon: 'activity',
-        createdAt: new Date(),
-        ocean: Ocean.Green,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Snowflake Bay',
-        location: { latitude: 52.3905, longitude: 4.9015 },
-        icon: 'toilet',
-        createdAt: new Date(),
-        ocean: Ocean.White,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Frost Haven',
-        location: { latitude: 52.3875, longitude: 4.904 },
-        icon: 'info',
-        createdAt: new Date(),
-        ocean: Ocean.White,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Ice Point',
-        location: { latitude: 52.392, longitude: 4.899 },
-        icon: 'food',
-        createdAt: new Date(),
-        ocean: Ocean.White,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Golden Shore',
-        location: { latitude: 52.3795, longitude: 4.922 },
-        icon: 'drink',
-        createdAt: new Date(),
-        ocean: Ocean.Yellow,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Amber Point',
-        location: { latitude: 52.378, longitude: 4.917 },
-        icon: 'activity',
-        createdAt: new Date(),
-        ocean: Ocean.Yellow,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Citrine Cove',
-        location: { latitude: 52.3755, longitude: 4.9315 },
-        icon: 'toilet',
-        createdAt: new Date(),
-        ocean: Ocean.Yellow,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Scarlet Lagoon',
-        location: { latitude: 52.3685, longitude: 4.9215 },
-        icon: 'info',
-        createdAt: new Date(),
-        ocean: Ocean.Red,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Crimson Shore',
-        location: { latitude: 52.3665, longitude: 4.925 },
-        icon: 'food',
-        createdAt: new Date(),
-        ocean: Ocean.Red,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Ruby Point',
-        location: { latitude: 52.37, longitude: 4.928 },
-        icon: 'drink',
-        createdAt: new Date(),
-        ocean: Ocean.Red,
-      },
-    ];
-
-    return locations;
-  }
+  // private locationsGenerator(): Location[] {
+  //   const locations = [
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Blue Lagoon',
+  //       location: { latitude: 52.398, longitude: 4.872 },
+  //       icon: 'toilet',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Blue,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Azure Haven',
+  //       location: { latitude: 52.4045, longitude: 4.8745 },
+  //       icon: 'info',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Blue,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Sapphire Shore',
+  //       location: { latitude: 52.407, longitude: 4.8715 },
+  //       icon: 'food',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Blue,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Emerald Lagoon',
+  //       location: { latitude: 52.4, longitude: 4.888 },
+  //       icon: 'drink',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Green,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Verdant Point',
+  //       location: { latitude: 52.4025, longitude: 4.8875 },
+  //       icon: 'activity',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Green,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Snowflake Bay',
+  //       location: { latitude: 52.3905, longitude: 4.9015 },
+  //       icon: 'toilet',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.White,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Frost Haven',
+  //       location: { latitude: 52.3875, longitude: 4.904 },
+  //       icon: 'info',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.White,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Ice Point',
+  //       location: { latitude: 52.392, longitude: 4.899 },
+  //       icon: 'food',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.White,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Golden Shore',
+  //       location: { latitude: 52.3795, longitude: 4.922 },
+  //       icon: 'drink',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Yellow,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Amber Point',
+  //       location: { latitude: 52.378, longitude: 4.917 },
+  //       icon: 'activity',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Yellow,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Citrine Cove',
+  //       location: { latitude: 52.3755, longitude: 4.9315 },
+  //       icon: 'toilet',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Yellow,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Scarlet Lagoon',
+  //       location: { latitude: 52.3685, longitude: 4.9215 },
+  //       icon: 'info',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Red,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Crimson Shore',
+  //       location: { latitude: 52.3665, longitude: 4.925 },
+  //       icon: 'food',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Red,
+  //     },
+  //     {
+  //       id: this.getRandomId(),
+  //       name: 'Ruby Point',
+  //       location: { latitude: 52.37, longitude: 4.928 },
+  //       icon: 'drink',
+  //       createdAt: new Date(),
+  //       ocean: Ocean.Red,
+  //     },
+  //   ];
+  //
+  //   return locations;
+  // }
 
   private utilitiesGenerator(): Utility[] {
-
     const utilities: Utility[] = [
       {
         id: this.getRandomId(),
@@ -344,6 +338,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '3044b6e8-885b-46d1-8b46-6d51902ea5b8',
         type: 'Toilet',
         createdAt: new Date(),
       },
@@ -358,6 +353,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '354ee77e-db99-412a-8d62-bf6c7a9cef50',
         type: 'Informatiepunt',
         createdAt: new Date(),
       },
@@ -373,6 +369,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '8891641b-3aea-4e0d-b710-ff0f8df78c14',
         type: 'Eten',
         createdAt: new Date(),
       },
@@ -387,6 +384,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '3e5d633e-70d3-449e-b5ca-d22661023364',
         type: 'Drinken',
         createdAt: new Date(),
       },
@@ -401,6 +399,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '5d51cd99-3372-406a-9090-4c18a5b463fb',
         type: 'Activiteit',
         createdAt: new Date(),
       },
@@ -415,6 +414,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '8cefd3df-d7b0-4f3e-9db9-3527a6a72892',
         type: 'Toilet',
         createdAt: new Date(),
       },
@@ -429,6 +429,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: 'b3b5a711-f5c8-4d5c-a016-850962aa95e0',
         type: 'Informatiepunt',
         createdAt: new Date(),
       },
@@ -443,6 +444,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: 'a6b6c544-840d-4e29-9102-1cb5610e5969',
         type: 'Eten',
         createdAt: new Date(),
       },
@@ -457,6 +459,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '6238a893-7f34-4616-a837-69a2b20fb1b6',
         type: 'Drinken',
         createdAt: new Date(),
       },
@@ -471,6 +474,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: 'd6c74138-b861-4f42-89ec-3b85525cf70a',
         type: 'Activiteit',
         createdAt: new Date(),
       },
@@ -485,6 +489,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '18137d5d-3c49-4a08-b1d1-2848537965b9',
         type: 'Toilet',
         createdAt: new Date(),
       },
@@ -499,6 +504,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '7306fcac-027c-4aef-83f0-2abf3155b422',
         type: 'Informatiepunt',
         createdAt: new Date(),
       },
@@ -513,6 +519,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: '49843757-a78d-45ec-8adc-ee93a81ef8a7',
         type: 'Eten',
         createdAt: new Date(),
       },
@@ -527,6 +534,7 @@ export class UtilitiesService {
           'Sat Aug 23 2025',
           'Sun Aug 24 2025',
         ],
+        locationId: 'd95a8ee4-071c-4498-9345-b26dc79c35f6',
         type: 'Drinken',
         createdAt: new Date(),
       },
