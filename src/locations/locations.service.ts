@@ -25,10 +25,10 @@ export class LocationsService {
   }
 
   private readonly client: CosmosClient;
-  private readonly databaseId = this.configService.get<string>('DATABASE_ID'); // Replace with your database ID
+  private readonly databaseId = this.configService.get<string>('DATABASE_ID');
   private readonly containerId = this.configService.get<string>(
     'LOCATION_CONTAINER_ID',
-  ); // Replace with your container ID
+  );
   private container: Container;
 
   async create(createLocationDto: CreateLocationDto) {
@@ -92,13 +92,6 @@ export class LocationsService {
   }
 
   async update(id: string, updateLocationDto: UpdateLocationDto) {
-    // const location = new Location();
-    // location.id = id;
-    // location.location = updateLocationDto.location;
-    // location.icon = updateLocationDto.icon;
-    // location.createdAt = new Date();
-    // location.ocean = updateLocationDto.ocean;
-    // location.name = updateLocationDto.name;
     try {
       const entity = this.classMapper.map(
         updateLocationDto,
@@ -121,7 +114,6 @@ export class LocationsService {
     } catch (ex) {
       throw new Error(`Update error: ${ex.message}.`);
     }
-    // return location;
   }
 
   async remove(id: string) {
@@ -142,22 +134,6 @@ export class LocationsService {
     return uuidv4();
   }
 
-  // Kill me please
-  private generateLocationResponse(id?: string): Location {
-    const location = new Location();
-    if (id == undefined) {
-      location.id = this.getRandomId();
-    } else {
-      location.id = id;
-    }
-    location.location = { longitude: 51.985103, latitude: 5.89873 };
-    location.icon = 'cheese_wheel';
-    location.createdAt = new Date();
-    location.ocean = Ocean.Blue;
-    location.name = 'Velperplein';
-    return location;
-  }
-
   async mockData() {
     try {
       for (const location of this.locationGenerator()) {
@@ -165,7 +141,7 @@ export class LocationsService {
         await this.container.items.create(location);
       }
     } catch (ex) {
-      throw new Error(`Remove error: ${ex.message}.`);
+      throw new Error(`Mock error: ${ex.message}.`);
     }
   }
 

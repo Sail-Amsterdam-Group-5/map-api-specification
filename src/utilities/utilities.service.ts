@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
 import { Utility } from './entities/utility.entity';
-import { Location, Ocean } from '../locations/entities/location.entity';
+import { Ocean } from '../locations/entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
@@ -10,8 +10,6 @@ import { ConfigService } from '@nestjs/config';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { ReadUtilityDto } from './dto/read-utility.dto';
 import { LocationsService } from '../locations/locations.service';
-import { Counter } from 'prom-client';
-import { InjectMetric } from '@willsoto/nestjs-prometheus';
 
 @Injectable()
 export class UtilitiesService {
@@ -19,7 +17,6 @@ export class UtilitiesService {
     @InjectMapper() private readonly classMapper: Mapper,
     private configService: ConfigService,
     private locationService: LocationsService,
-    // @InjectMetric('nodejs_active_requests') public counter: Counter<string>,
   ) {
     const endpoint = this.configService.get<string>('COSMOSDB_ENDPOINT');
     const key = this.configService.get<string>('COSMOSDB_KEY');
@@ -31,14 +28,13 @@ export class UtilitiesService {
   }
 
   private readonly client: CosmosClient;
-  private readonly databaseId = this.configService.get<string>('DATABASE_ID'); // Replace with your database ID
+  private readonly databaseId = this.configService.get<string>('DATABASE_ID');
   private readonly containerId = this.configService.get<string>(
     'UTILITY_CONTAINER_ID',
-  ); // Replace with your container ID
+  );
   private container: Container;
 
   async create(createUtilityDto: CreateUtilityDto) {
-    // this.counter.inc(1);
     try {
       const entity = this.classMapper.map(
         createUtilityDto,
@@ -57,10 +53,8 @@ export class UtilitiesService {
       const result = this.classMapper.map(resource, Utility, ReadUtilityDto);
       result.dates = resource.dates;
       result.location = location;
-      // this.counter.inc(-1);
       return result;
     } catch (ex) {
-      // this.counter.inc(-1);
       throw new HttpException(
         `Create error: ${ex.message}`,
         HttpStatus.BAD_REQUEST,
@@ -69,7 +63,6 @@ export class UtilitiesService {
   }
 
   async findAll() {
-    // this.counter.inc(1);
     try {
       const { resources } = await this.container.items
         .query('SELECT * from c')
@@ -88,10 +81,8 @@ export class UtilitiesService {
           return result;
         }),
       );
-      // this.counter.inc(-1);
       return res;
     } catch (ex) {
-      // this.counter.inc(-1);
       throw new Error(`Find all error: ${ex.message}.`);
     }
   }
@@ -195,190 +186,132 @@ export class UtilitiesService {
     }
   }
 
+  async mockData() {
+    try {
+      for (const utility of this.utilitiesGenerator()) {
+        utility.typeId = utility.typeId + utility.id;
+        await this.container.items.create(utility);
+      }
+    } catch (ex) {
+      throw new Error(`Mock error: ${ex.message}.`);
+    }
+  }
+
   private getRandomId() {
     return uuidv4();
   }
-  private generateRandomResponse(
-    id?: string,
-    locationId?: string,
-    type?: string,
-    dates?: string[],
-  ): Utility {
-    const utility = new Utility();
-    if (id == undefined) {
-      utility.id = this.getRandomId();
-    } else {
-      utility.id = id;
-    }
-    utility.name = 'Toilet Velperplein';
-    utility.description =
-      'This is the toilet at Velperplein which is open from 08:00 till 22:00.';
-    if (locationId == undefined) {
-      utility.location = this.generateLocationResponse();
-    } else {
-      utility.location = this.generateLocationResponse(locationId);
-    }
-    utility.createdAt = new Date();
-    if (type == undefined) {
-      utility.type = 'toilet';
-    } else {
-      utility.type = type;
-    }
-    if (dates == undefined) {
-      const date = new Date('2025-08-20').setDate(
-        new Date('2025-08-20').getDate() + 1,
-      );
-      utility.dates = [
-        new Date('2025-08-20').toDateString(),
-        new Date(date).toDateString(),
-      ];
-    } else {
-      console.log(dates);
-      utility.dates = [];
-      dates.forEach((date) => {
-        console.log(date);
-        console.log(utility.dates);
-        utility.dates.push(date);
-      });
-    }
-    return utility;
-  }
-
-  private generateLocationResponse(id?: string): Location {
-    const location = new Location();
-    if (id == undefined) {
-      location.id = this.getRandomId();
-    } else {
-      location.id = id;
-    }
-    location.location = { longitude: 51.985103, latitude: 5.89873 };
-    location.icon = 'cheese_wheel';
-    location.createdAt = new Date();
-    location.ocean = Ocean.Blue;
-    location.name = 'Velperplein';
-
-    return location;
-  }
 
   private utilitiesGenerator(): Utility[] {
-    const locations: Location[] = [
+    const locations = [
       {
         id: this.getRandomId(),
-        name: 'Blue Harbor',
-        location: { latitude: 52.3995, longitude: 4.8702 },
+        name: 'Blue Lagoon',
+        location: { latitude: 52.398, longitude: 4.872 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.Blue,
       },
       {
         id: this.getRandomId(),
-        name: 'Azure Port',
-        location: { latitude: 52.4058, longitude: 4.8762 },
+        name: 'Azure Haven',
+        location: { latitude: 52.4045, longitude: 4.8745 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.Blue,
       },
       {
         id: this.getRandomId(),
-        name: 'Sapphire Bay',
-        location: { latitude: 52.4085, longitude: 4.8725 },
+        name: 'Sapphire Shore',
+        location: { latitude: 52.407, longitude: 4.8715 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.Blue,
       },
       {
         id: this.getRandomId(),
-        name: 'Emerald Shore',
-        location: { latitude: 52.4011, longitude: 4.89 },
+        name: 'Emerald Lagoon',
+        location: { latitude: 52.4, longitude: 4.888 },
         icon: 'drink',
         createdAt: new Date(),
         ocean: Ocean.Green,
       },
       {
         id: this.getRandomId(),
-        name: 'Verdant Cove',
-        location: { latitude: 52.4039, longitude: 4.8868 },
+        name: 'Verdant Point',
+        location: { latitude: 52.4025, longitude: 4.8875 },
         icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Green,
       },
       {
         id: this.getRandomId(),
-        name: 'Snowy Haven',
-        location: { latitude: 52.3912, longitude: 4.9003 },
+        name: 'Snowflake Bay',
+        location: { latitude: 52.3905, longitude: 4.9015 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.White,
       },
       {
         id: this.getRandomId(),
-        name: 'Frosty Beach',
-        location: { latitude: 52.3868, longitude: 4.905 },
+        name: 'Frost Haven',
+        location: { latitude: 52.3875, longitude: 4.904 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.White,
       },
       {
         id: this.getRandomId(),
-        name: 'Iceberg Point',
-        location: { latitude: 52.3894, longitude: 4.9001 },
+        name: 'Ice Point',
+        location: { latitude: 52.392, longitude: 4.899 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.White,
       },
       {
         id: this.getRandomId(),
-        name: 'Golden Sands',
-        location: { latitude: 52.3806, longitude: 4.9201 },
+        name: 'Golden Shore',
+        location: { latitude: 52.3795, longitude: 4.922 },
         icon: 'drink',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
       },
       {
         id: this.getRandomId(),
-        name: 'Amber Cove',
-        location: { latitude: 52.3788, longitude: 4.9153 },
+        name: 'Amber Point',
+        location: { latitude: 52.378, longitude: 4.917 },
         icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
       },
       {
         id: this.getRandomId(),
-        name: 'Citrine Bay',
-        location: { latitude: 52.3769, longitude: 4.93 },
+        name: 'Citrine Cove',
+        location: { latitude: 52.3755, longitude: 4.9315 },
         icon: 'toilet',
         createdAt: new Date(),
         ocean: Ocean.Yellow,
       },
       {
         id: this.getRandomId(),
-        name: 'Scarlet Reef',
-        location: { latitude: 52.369, longitude: 4.9201 },
+        name: 'Scarlet Lagoon',
+        location: { latitude: 52.3685, longitude: 4.9215 },
         icon: 'info',
         createdAt: new Date(),
         ocean: Ocean.Red,
       },
       {
         id: this.getRandomId(),
-        name: 'Crimson Bay',
-        location: { latitude: 52.3678, longitude: 4.9263 },
+        name: 'Crimson Shore',
+        location: { latitude: 52.3665, longitude: 4.925 },
         icon: 'food',
         createdAt: new Date(),
         ocean: Ocean.Red,
       },
       {
         id: this.getRandomId(),
-        name: 'Ruby Shore',
-        location: { latitude: 52.3715, longitude: 4.9295 },
+        name: 'Ruby Point',
+        location: { latitude: 52.37, longitude: 4.928 },
         icon: 'drink',
-        createdAt: new Date(),
-        ocean: Ocean.Red,
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Ruby Cove',
-        location: { latitude: 52.369, longitude: 4.9279 },
-        icon: 'activity',
         createdAt: new Date(),
         ocean: Ocean.Red,
       },

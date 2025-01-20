@@ -119,9 +119,4 @@ export class LocationsController {
   createMockData() {
     return this.locationsService.mockData();
   }
-
-  // @Get('headers')
-  // getHeaders(@Headers() headers) {
-  //   return headers;
-  // }
 }

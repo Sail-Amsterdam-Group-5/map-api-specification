@@ -228,4 +228,10 @@ export class UtilitiesController {
   remove(@Param('id') id: string) {
     return this.utilitiesService.remove(id);
   }
+
+  @ApiOkResponse({ description: 'This action creates mock data' })
+  @Post('mock')
+  createMockData() {
+    return this.utilitiesService.mockData();
+  }
 }
