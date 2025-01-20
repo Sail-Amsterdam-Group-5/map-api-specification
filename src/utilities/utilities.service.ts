@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { ReadUtilityDto } from './dto/read-utility.dto';
 import { LocationsService } from '../locations/locations.service';
+import { CreateLocationDto } from '../locations/dto/create-location.dto';
 
 @Injectable()
 export class UtilitiesService {
@@ -190,6 +191,12 @@ export class UtilitiesService {
     try {
       for (const utility of this.utilitiesGenerator()) {
         utility.typeId = utility.typeId + utility.id;
+        const test: CreateLocationDto = new CreateLocationDto();
+        test.location = utility.location.location;
+        test.name = utility.location.name;
+        test.icon = utility.location.icon;
+        test.ocean = utility.location.ocean;
+        await this.locationService.create(test);
         await this.container.items.create(utility);
       }
     } catch (ex) {
