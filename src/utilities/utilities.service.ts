@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUtilityDto } from './dto/create-utility.dto';
 import { UpdateUtilityDto } from './dto/update-utility.dto';
 import { Utility } from './entities/utility.entity';
-import { Ocean } from '../locations/entities/location.entity';
+import { Location, Ocean } from '../locations/entities/location.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
@@ -189,14 +189,17 @@ export class UtilitiesService {
 
   async mockData() {
     try {
+      const locations = this.locationsGenerator();
       for (const utility of this.utilitiesGenerator()) {
         utility.typeId = utility.typeId + utility.id;
         const test: CreateLocationDto = new CreateLocationDto();
-        test.location = utility.location.location;
-        test.name = utility.location.name;
-        test.icon = utility.location.icon;
-        test.ocean = utility.location.ocean;
+        test.location = locations[0].location
+        test.name = locations[0].name;
+        test.icon = locations[0].icon;
+        test.ocean = locations[0].ocean;
         await this.locationService.create(test);
+        utility.locationId = locations[0].id;
+        locations.shift();
         await this.container.items.create(utility);
       }
     } catch (ex) {
@@ -208,7 +211,7 @@ export class UtilitiesService {
     return uuidv4();
   }
 
-  private utilitiesGenerator(): Utility[] {
+  private locationsGenerator(): Location[] {
     const locations = [
       {
         id: this.getRandomId(),
@@ -324,12 +327,16 @@ export class UtilitiesService {
       },
     ];
 
+    return locations;
+  }
+
+  private utilitiesGenerator(): Utility[] {
+
     const utilities: Utility[] = [
       {
         id: this.getRandomId(),
         name: 'Toilet',
         description: 'Een openbaar toilet beschikbaar van 08:00 tot 22:00.',
-        location: locations[0],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -344,7 +351,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Infopunt',
         description: 'Een infobalie om bezoekers te helpen.',
-        location: locations[1],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -360,7 +366,6 @@ export class UtilitiesService {
         name: 'Foodtruck Vis',
         description:
           'Een eetkraam met een verscheidenheid aan snacks en maaltijden.',
-        location: locations[2],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -375,7 +380,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Cola Tappunt',
         description: 'Een drankkraam met verfrissende dranken.',
-        location: locations[3],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -390,7 +394,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Game cafe',
         description: 'Een gebied voor leuke activiteiten en spelletjes.',
-        location: locations[4],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -405,7 +408,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Toilet',
         description: 'Een toilet beschikbaar voor openbaar gebruik.',
-        location: locations[5],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -420,7 +422,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Infopunt',
         description: 'Een plek om hulp en informatie te krijgen.',
-        location: locations[6],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -435,7 +436,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Unox Stand',
         description: 'Een plek om snel snacks en maaltijden te halen.',
-        location: locations[7],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -450,7 +450,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Warme Chocomelk',
         description: 'Een kraam met een verscheidenheid aan dranken en sappen.',
-        location: locations[8],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -465,7 +464,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Kaart spellen',
         description: 'Geniet hier van spelletjes en recreatieve activiteiten.',
-        location: locations[9],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -480,7 +478,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Toilet',
         description: 'Een schoon toilet beschikbaar voor bezoekers.',
-        location: locations[10],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -495,7 +492,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Infopunt',
         description: 'Informatie en hulp beschikbaar hier.',
-        location: locations[11],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -510,7 +506,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: "Nando's nachos",
         description: 'Een eetkraam die heerlijke maaltijden aanbiedt.',
-        location: locations[12],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -525,7 +520,6 @@ export class UtilitiesService {
         id: this.getRandomId(),
         name: 'Heineken Bar',
         description: 'Geniet hier van een scala aan dranken.',
-        location: locations[13],
         dates: [
           'Wed Aug 20 2025',
           'Thu Aug 21 2025',
@@ -534,21 +528,6 @@ export class UtilitiesService {
           'Sun Aug 24 2025',
         ],
         type: 'Drinken',
-        createdAt: new Date(),
-      },
-      {
-        id: this.getRandomId(),
-        name: 'Dansvloer',
-        description: 'Een levendig gebied voor activiteiten en entertainment.',
-        location: locations[14],
-        dates: [
-          'Wed Aug 20 2025',
-          'Thu Aug 21 2025',
-          'Fri Aug 22 2025',
-          'Sat Aug 23 2025',
-          'Sun Aug 24 2025',
-        ],
-        type: 'Activiteit',
         createdAt: new Date(),
       },
     ];
